@@ -1,6 +1,6 @@
 # Modern Portfolio Website
 
-A cutting-edge, responsive portfolio website built with React 18, featuring modern design patterns, advanced animations, and comprehensive GitHub Pages deployment support.
+A cutting-edge, responsive portfolio website built with React 19 and Vite, featuring modern design patterns, advanced animations, and comprehensive GitHub Pages deployment support.
 
 ## 🚀 Live Demo
 
@@ -31,22 +31,23 @@ Visit the live website: [https://anuragvaidhya.github.io/portfolio](https://anur
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **React 18.2.0**: Latest React with concurrent features and Suspense
-- **React Router 6**: Modern routing with lazy loading support
-- **Bootstrap 5.3**: Responsive grid system and utility classes
+- **React 19**: Concurrent rendering, Suspense and lazy-loaded routes
+- **React Router 7**: Client-side routing with lazy-loaded pages
 - **Modern CSS**: CSS Grid, Flexbox, custom properties, and animations
-- **FontAwesome 6**: Comprehensive icon library
+- **Font Awesome 7**: Bundled inline SVG icons (only the icons used; see `src/icons.js`)
 
 ### Development & Deployment
 - **GitHub Actions**: Automated CI/CD pipeline
 - **GitHub Pages**: Static site hosting with custom domain support
-- **Node.js 16.20.2**: Stable LTS version for development
-- **React Scripts 4.0.3**: Build tooling with webpack optimization
+- **Node.js 26 LTS**: Pinned in `.nvmrc` / `.node-version`
+- **Vite 8**: Dev server and production build (output in `build/`)
+- **Vitest + Testing Library**: `npm test`
+- **ESLint 10**: `npm run lint`
 
 ## 📦 Quick Start
 
 ### Prerequisites
-- Node.js 16.20.2 or higher
+- Node.js 26 LTS (`nvm use` picks it up from `.nvmrc`)
 - npm or yarn package manager
 - Git for version control
 
@@ -73,8 +74,8 @@ npm run build
 # Deploy to GitHub Pages
 npm run deploy
 
-# Test production build locally
-npm run serve
+# Preview the production build locally
+npm run preview
 ```
 
 ## 🚀 GitHub Pages Deployment

@@ -1,5 +1,5 @@
 // jsdom lacks a few browser APIs the app relies on; provide minimal stand-ins for tests.
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 if (!window.matchMedia) {
   window.matchMedia = (query) => ({

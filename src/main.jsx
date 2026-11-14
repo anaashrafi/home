@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import "./icons";
 import "./index.css";
 import App from "./App";
-import * as serviceWorker from "./serviceWorker";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { initializeGA } from "./hooks/useAnalytics";
 import { googleAnalyticsMeasurementId } from "./editable-stuff/configurations.json";
@@ -21,6 +20,3 @@ root.render(
     </ErrorBoundary>
   </React.StrictMode>
 );
-
-// Enable service worker for PWA capabilities
-serviceWorker.register();

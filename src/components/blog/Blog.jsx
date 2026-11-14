@@ -1,8 +1,8 @@
-import React, { useState, Fragment } from "react";
+import React, { Fragment } from "react";
 import { BlogBuilder } from "./BlogBuilder";
 import bloglist from "../../editable-stuff/blog";
 import { Link } from "react-router-dom";
-const Blog = (props) => {
+const Blog = () => {
   return (
     <div className="container-lg mt-5 bg-blue">
       <h1 className="text-center">Blogs</h1>
@@ -20,7 +20,7 @@ const Blog = (props) => {
   );
 };
 
-const BlogCard = ({ index, title, image, description }) => {
+const BlogCard = ({ index, title, description }) => {
   return (
     <div className="m-5">
       <div className="">
@@ -32,7 +32,7 @@ const BlogCard = ({ index, title, image, description }) => {
             <div className="">
               <h1 className="">{title}</h1>
               <p className="lead">{description}</p>
-              <Link to={`${process.env.PUBLIC_URL}blog/${index}`}>
+              <Link to={`/blog/${index}`}>
                 Read more...{" "}
               </Link>
             </div>

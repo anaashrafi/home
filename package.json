@@ -1,53 +1,53 @@
 {
   "name": "developers-portfolio",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
+  "type": "module",
+  "homepage": "https://www.anuragvaidhya.com",
+  "engines": {
+    "node": ">=26.0.0"
+  },
+  "scripts": {
+    "predev": "node scripts/check-node.cjs",
+    "dev": "vite",
+    "prestart": "node scripts/check-node.cjs",
+    "start": "vite",
+    "prebuild": "node scripts/check-node.cjs",
+    "build": "vite build",
+    "prepreview": "node scripts/check-node.cjs",
+    "preview": "vite preview --port 3000",
+    "serve": "vite preview --port 3000",
+    "pretest": "node scripts/check-node.cjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
   "dependencies": {
-    "@fortawesome/free-brands-svg-icons": "^6.5.1",
-    "@fortawesome/free-regular-svg-icons": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
-    "@popperjs/core": "^2.11.8",
-    "firebase": "^10.14.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-ga4": "^2.1.0",
-    "react-router-dom": "^6.22.3",
-    "web-vitals": "^3.5.2"
+    "@firebase/app": "^0.16.6",
+    "@firebase/database": "^1.1.6",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/free-regular-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-ga4": "^3.0.1",
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/react": "18.0.0",
-    "@types/react-dom": "18.0.0",
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2",
-    "gh-pages": "^6.1.1",
-    "react-scripts": "4.0.3",
-    "schema-utils": "2.7.1",
-    "terser-webpack-plugin": "4.2.3",
-    "typescript": "4.4.4"
-  },
-  "homepage": "https://www.anuragvaidhya.com",
-  "scripts": {
-    "start": "GENERATE_SOURCEMAP=false react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "serve": "npx serve -s build -l 3000"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@vitejs/plugin-react": "^6.3.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "gh-pages": "^6.3.0",
+    "globals": "^17.14.0",
+    "jsdom": "^31.0.1",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }

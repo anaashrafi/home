@@ -77,7 +77,7 @@ const renderIcon = (el) => {
   if (el.dataset.faIcon === key) return;
   const def = ICONS[key];
   if (!def) {
-    if (process.env.NODE_ENV !== "production") console.warn(`[icons] "${prefix} fa-${name}" is not registered in src/icons.js`);
+    if (import.meta.env.DEV) console.warn(`[icons] "${prefix} fa-${name}" is not registered in src/icons.js`);
     return;
   }
   el.dataset.faIcon = key;

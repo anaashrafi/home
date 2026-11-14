@@ -193,7 +193,7 @@ export const useLocalStorage = (key, initialValue, options = {}) => {
  * @param {object} options - Configuration options
  * @returns {object} Storage utilities
  */
-export const useMultipleLocalStorage = (keys, options = {}) => {
+export const useMultipleLocalStorage = (keys) => {
   const [values, setValues] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState({});

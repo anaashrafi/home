@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 
@@ -380,7 +380,7 @@ export const useComponentAnalytics = (componentName) => {
  */
 export const useABTest = (testName, variants, options = {}) => {
   const { trackEvent } = useAnalytics();
-  const { persistVariant = true, defaultVariant = variants[0] } = options;
+  const { persistVariant = true } = options;
   
   const getVariant = useCallback(() => {
     if (persistVariant) {

@@ -13,57 +13,40 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [16.20.2]
-    
+
     steps:
       - name: Checkout Repository 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js ${{ matrix.node-version }} 🔧
-        uses: actions/setup-node@v4
+      - name: Setup Node.js 🔧
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: 'npm'
 
-      - name: Clear npm cache 🧹
-        run: |
-          npm cache clean --force
-
       - name: Install Dependencies 📦
-        run: |
-          npm ci
-          
-      - name: Run Tests 🧪
-        run: |
-          npm test -- --coverage --watchAll=false
-        continue-on-error: true
+        run: npm ci
 
-      - name: Clean Build Directory 🗑️
-        run: |
-          rm -rf build/
+      - name: Lint 🧹
+        run: npm run lint
+
+      - name: Run Tests 🧪
+        run: npm test
 
       - name: Build Application 🏗️
-        run: |
-          npm run build
-        env:
-          CI: false
-          GENERATE_SOURCEMAP: false
-          # Removed PUBLIC_URL to use root domain
+        run: npm run build
 
       - name: Verify Build Output 🔍
         run: |
-          echo "Build completed. Checking output..."
           ls -la build/
-          echo "Checking index.html for correct paths..."
-          grep -n "static/" build/index.html || echo "No static paths found"
+          test -f build/index.html
+          test -f build/404.html
+          grep -q 'assets/index-' build/index.html
 
       - name: Deploy to GitHub Pages 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4.9.0
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
         with:
           branch: gh-pages
@@ -78,4 +61,3 @@ jobs:
           echo "✅ Deployment completed successfully!"
           echo "🌐 Site URL: https://www.anuragvaidhya.com"
           echo "⏰ Deployed at: $(date)"
-          echo "🔄 Cache may take 5-10 minutes to clear"

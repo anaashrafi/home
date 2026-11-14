@@ -18,8 +18,8 @@ let dbPromise = null;
 export const loadDatabase = () => {
   if (!dbPromise) {
     dbPromise = Promise.all([
-      import(/* webpackChunkName: "firebase" */ 'firebase/app'),
-      import(/* webpackChunkName: "firebase" */ 'firebase/database'),
+      import('@firebase/app'),
+      import('@firebase/database'),
     ]).then(([{ initializeApp }, db]) => {
       const app = initializeApp(firebaseConfig);
       return {

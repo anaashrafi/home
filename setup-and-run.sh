@@ -60,7 +60,7 @@ install_nvm() {
 
 # Function to install Node.js using nvm
 install_node_with_nvm() {
-    local node_version="16.20.2"
+    local node_version="26"
     
     if [ -f ".nvmrc" ]; then
         node_version=$(cat .nvmrc | tr -d '[:space:]')
@@ -79,8 +79,8 @@ install_node_with_nvm() {
 # Function to install Node.js using Homebrew (macOS alternative)
 install_node_with_brew() {
     echo "📦 Installing Node.js using Homebrew..."
-    brew install node@16
-    brew link node@16
+    brew install node@26
+    brew link node@26
     echo "✅ Node.js installed via Homebrew"
     echo ""
 }

@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component {
             <i className="fas fa-house" aria-hidden="true"></i> Go Home
           </button>
         </div>
-        {process.env.NODE_ENV === "development" && (
+        {import.meta.env.DEV && (
           <details style={{ textAlign: "left", marginTop: "var(--space-md)" }}>
             <summary>Show error details</summary>
             <pre style={{ fontSize: "var(--fs-xs)", whiteSpace: "pre-wrap" }}>

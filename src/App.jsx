@@ -93,7 +93,7 @@ const AppRouter = () => {
 
 const App = () => (
   <ThemeProvider>
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AppRouter />
     </BrowserRouter>
   </ThemeProvider>
