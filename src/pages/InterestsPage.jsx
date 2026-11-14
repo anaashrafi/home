@@ -6,7 +6,7 @@ const Interests = React.lazy(() => import("../components/home/Interests"));
 
 const InterestsPage = () => (
   <div>
-    <PageHeader title="Personal Interests" subtitle="What keeps me inspired and balanced after 15+ years in the fast-paced tech industry" />
+    <PageHeader kicker="~/interests" title="Personal Interests" subtitle="What keeps me inspired and balanced after 15+ years in the fast-paced tech industry" />
     <Suspense fallback={<LoadingSpinner />}>
       <Interests />
     </Suspense>

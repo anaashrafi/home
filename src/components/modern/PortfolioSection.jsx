@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Reveal from '../Reveal';
-import CountUp from '../CountUp';
-import { gitHubLink, gitHubUsername, gitHubQuerry } from '../../editable-stuff/configurations.json';
-
-const LANGUAGE_COLORS = {
-  JavaScript: '#f1e05a', TypeScript: '#2b7489', Python: '#3572A5', Java: '#b07219',
-  HTML: '#e34c26', CSS: '#563d7c', Shell: '#89e051', Dockerfile: '#384d54',
-  Go: '#00ADD8', PHP: '#4F5D95', Ruby: '#701516', 'C++': '#f34b7d', C: '#555555',
-  Swift: '#ffac45', Kotlin: '#F18E33', Rust: '#dea584',
-};
+import { gitHubUsername } from '../../editable-stuff/configurations.json';
+import { fetchRepos, LANGUAGE_COLORS } from '../../hooks/useGitHub';
 
 const CATEGORY_DEFS = [
   { id: 'cloud', title: 'Cloud & Infrastructure', match: (p) => p.topics?.some((t) => ['aws', 'azure', 'gcp', 'cloud', 'docker', 'kubernetes', 'terraform'].includes(t)) || /cloud|infrastructure/i.test(p.description || '') },
@@ -69,31 +62,23 @@ const PortfolioSection = () => {
   const [sort, setSort] = useState('updated');
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${gitHubLink}${gitHubUsername}${gitHubQuerry}`);
-        if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-        const repos = await response.json();
+    let cancelled = false;
+    fetchRepos()
+      .then((repos) => {
+        if (cancelled) return;
         setProjects(
-          repos
-            .filter((r) => !r.fork)
-            .slice(0, 30)
-            .map((r) => ({
-              id: r.id, name: r.name,
-              description: r.description || `A ${r.language || 'software'} project by ${gitHubUsername}`,
-              html_url: r.html_url, homepage: r.homepage, language: r.language,
-              stargazers_count: r.stargazers_count, forks_count: r.forks_count,
-              updated_at: r.updated_at, topics: r.topics || [],
-            }))
+          repos.slice(0, 30).map((r) => ({
+            id: r.id, name: r.name,
+            description: r.description || `A ${r.language || 'software'} project by ${gitHubUsername}`,
+            html_url: r.html_url, homepage: r.homepage, language: r.language,
+            stargazers_count: r.stargazers_count, forks_count: r.forks_count,
+            updated_at: r.pushed_at || r.updated_at, topics: r.topics || [],
+          }))
         );
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
+      })
+      .catch((err) => !cancelled && setError(err.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
   }, []);
 
   const sorted = useMemo(() => {
@@ -119,16 +104,6 @@ const PortfolioSection = () => {
     [projects]
   );
 
-  const languageCount = useMemo(
-    () => new Set(projects.map((p) => p.language).filter(Boolean)).size,
-    [projects]
-  );
-
-  const activeCount = useMemo(() => {
-    const sixMonthsAgo = Date.now() - 180 * 24 * 60 * 60 * 1000;
-    return projects.filter((p) => new Date(p.updated_at).getTime() > sixMonthsAgo).length;
-  }, [projects]);
-
   if (loading) {
     return <div className="container state-block"><i className="fas fa-spinner fa-spin"></i><p>Loading projects from GitHub&hellip;</p></div>;
   }
@@ -145,17 +120,6 @@ const PortfolioSection = () => {
   return (
     <div className="container">
       <Reveal as="section" className="section" style={{ paddingTop: 0 }}>
-        <div className="stat-grid" style={{ marginBottom: 'var(--space-lg)' }}>
-          <div className="stat"><span className="stat-number"><CountUp end={projects.length} /></span><span className="stat-label">Public Repos</span></div>
-          <div className="stat"><span className="stat-number"><CountUp end={languageCount} /></span><span className="stat-label">Languages Used</span></div>
-          <div className="stat"><span className="stat-number"><CountUp end={activeCount} /></span><span className="stat-label">Updated Last 6mo</span></div>
-          <div>
-            <a href={`https://github.com/${gitHubUsername}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-              <i className="fab fa-github" aria-hidden="true"></i> View on GitHub
-            </a>
-          </div>
-        </div>
-
         <div className="project-toolbar">
           <div className="tabs" style={{ marginBottom: 0, borderBottom: 'none' }} role="tablist">
             {TABS.map((tab) => (

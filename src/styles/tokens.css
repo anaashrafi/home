@@ -1,25 +1,30 @@
 /*
   Design tokens — single source of truth for color, spacing, type, motion.
   Theme is switched by toggling [data-theme] on <html>; ThemeContext handles that.
+
+  Identity: "aurora" — violet → blue → cyan gradient on a deep ink base,
+  Space Grotesk display type, glass surfaces.
 */
 
 :root {
   /* Type */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --fs-xs: 0.8125rem;
   --fs-sm: 0.9375rem;
   --fs-base: 1rem;
   --fs-md: 1.125rem;
-  --fs-lg: 1.3rem;
-  --fs-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
-  --fs-2xl: clamp(1.9rem, 1.4rem + 2vw, 2.75rem);
-  --fs-3xl: clamp(2.4rem, 1.6rem + 3.2vw, 3.75rem);
+  --fs-lg: 1.35rem;
+  --fs-xl: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem);
+  --fs-2xl: clamp(2.1rem, 1.4rem + 2.6vw, 3.25rem);
+  --fs-3xl: clamp(2.6rem, 1.4rem + 4.6vw, 4.75rem);
+  --fs-hero: clamp(3rem, 1.2rem + 7vw, 6.5rem);
 
-  --lh-tight: 1.15;
+  --lh-tight: 1.05;
   --lh-snug: 1.35;
-  --lh-normal: 1.6;
+  --lh-normal: 1.65;
 
   /* Spacing */
   --space-3xs: 0.25rem;
@@ -29,13 +34,13 @@
   --space-md: 1.5rem;
   --space-lg: 2.25rem;
   --space-xl: 3.5rem;
-  --space-2xl: 5rem;
-  --space-3xl: 7.5rem;
+  --space-2xl: 5.5rem;
+  --space-3xl: 8rem;
 
   /* Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
   --radius-full: 999px;
 
   /* Motion */
@@ -43,95 +48,146 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration-fast: 150ms;
   --duration-base: 300ms;
-  --duration-slow: 550ms;
+  --duration-slow: 650ms;
 
   /* Layout */
-  --container-max: 1180px;
-  --container-pad: clamp(1.25rem, 4vw, 2.5rem);
-  --nav-height: 68px;
+  --container-max: 1220px;
+  --container-pad: clamp(1rem, 4vw, 2.5rem);
+  --nav-height: 72px;
 
-  /* Accent — deep teal, tuned for a cloud/platform-engineering identity */
-  --color-accent: #0d9488;
-  --color-accent-hover: #0f766e;
-  --color-accent-soft: rgba(13, 148, 136, 0.1);
+  /* Brand — light */
+  --color-accent: #6d28d9;
+  --color-accent-hover: #5b21b6;
+  --color-accent-soft: rgba(109, 40, 217, 0.09);
   --color-accent-contrast: #ffffff;
+  --color-accent-2: #0e7490;
+  --color-accent-2-soft: rgba(14, 116, 144, 0.1);
+  --gradient-brand: linear-gradient(115deg, #7c3aed 0%, #4f46e5 45%, #0891b2 100%);
+  --gradient-text: linear-gradient(100deg, #6d28d9 0%, #4338ca 50%, #0e7490 100%);
+  --aurora-1: rgba(124, 58, 237, 0.16);
+  --aurora-2: rgba(8, 145, 178, 0.13);
+  --aurora-3: rgba(236, 72, 153, 0.08);
 
-  --color-success: #16a34a;
-  --color-success-soft: rgba(22, 163, 74, 0.1);
+  --color-success: #15803d;
+  --color-success-soft: rgba(21, 128, 61, 0.1);
   --color-danger: #dc2626;
   --color-danger-soft: rgba(220, 38, 38, 0.1);
 
   /* Neutrals — light (default) */
-  --color-bg: #ffffff;
-  --color-bg-subtle: #f7f7f8;
+  --color-bg: #faf9ff;
+  --color-bg-subtle: #f1eff9;
   --color-bg-elevated: #ffffff;
-  --color-bg-inverse: #18181b;
-  --color-border: #e7e7ea;
-  --color-border-strong: #d4d4d8;
-  --color-text: #18181b;
-  --color-text-secondary: #52525b;
-  --color-text-tertiary: #8b8b93;
-  --color-scrim: rgba(24, 24, 27, 0.5);
+  --color-bg-inverse: #0f0d1a;
+  --color-border: #e6e3f2;
+  --color-border-strong: #d0cce3;
+  --color-text: #0f0d1a;
+  --color-text-secondary: #4b4763;
+  --color-text-tertiary: #6e6a85;
+  --color-scrim: rgba(15, 13, 26, 0.45);
 
-  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.05);
-  --shadow-md: 0 8px 24px rgba(24, 24, 27, 0.07);
-  --shadow-lg: 0 20px 48px rgba(24, 24, 27, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(109, 40, 217, 0.12);
+
+  --heat-0: #ebe8f5;
+  --heat-1: #c4b5fd;
+  --heat-2: #8b5cf6;
+  --heat-3: #6d28d9;
+  --heat-4: #4c1d95;
+
+  --shadow-sm: 0 1px 2px rgba(15, 13, 26, 0.05);
+  --shadow-md: 0 10px 30px -8px rgba(76, 29, 149, 0.14);
+  --shadow-lg: 0 30px 60px -18px rgba(76, 29, 149, 0.25);
+  --shadow-glow: 0 0 0 1px rgba(124, 58, 237, 0.25), 0 12px 40px -10px rgba(124, 58, 237, 0.35);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-accent: #2dd4bf;
-    --color-accent-hover: #5eead4;
-    --color-accent-soft: rgba(45, 212, 191, 0.14);
-    --color-accent-contrast: #08110f;
+    --color-accent: #a78bfa;
+    --color-accent-hover: #c4b5fd;
+    --color-accent-soft: rgba(167, 139, 250, 0.13);
+    --color-accent-contrast: #0b0817;
+    --color-accent-2: #22d3ee;
+    --color-accent-2-soft: rgba(34, 211, 238, 0.12);
+    --gradient-brand: linear-gradient(115deg, #8b5cf6 0%, #6366f1 45%, #06b6d4 100%);
+    --gradient-text: linear-gradient(100deg, #c4b5fd 0%, #818cf8 45%, #67e8f9 100%);
+    --aurora-1: rgba(124, 58, 237, 0.28);
+    --aurora-2: rgba(6, 182, 212, 0.18);
+    --aurora-3: rgba(236, 72, 153, 0.12);
 
     --color-success: #4ade80;
     --color-success-soft: rgba(74, 222, 128, 0.12);
     --color-danger: #f87171;
     --color-danger-soft: rgba(248, 113, 113, 0.12);
 
-    --color-bg: #0a0a0b;
-    --color-bg-subtle: #131316;
-    --color-bg-elevated: #19191c;
-    --color-bg-inverse: #f4f4f5;
-    --color-border: #26262a;
-    --color-border-strong: #38383e;
-    --color-text: #f4f4f5;
-    --color-text-secondary: #a3a3ab;
-    --color-text-tertiary: #6f6f78;
-    --color-scrim: rgba(0, 0, 0, 0.6);
+    --color-bg: #07060d;
+    --color-bg-subtle: #11101b;
+    --color-bg-elevated: #15131f;
+    --color-bg-inverse: #f4f3fb;
+    --color-border: #24212f;
+    --color-border-strong: #363246;
+    --color-text: #f4f3fb;
+    --color-text-secondary: #aba7bf;
+    --color-text-tertiary: #8a86a0;
+    --color-scrim: rgba(3, 2, 8, 0.65);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
+    --glass-bg: rgba(21, 19, 31, 0.62);
+    --glass-border: rgba(167, 139, 250, 0.12);
+
+    --heat-0: #1b1928;
+    --heat-1: #3b2a6b;
+    --heat-2: #5b3fb0;
+    --heat-3: #8b5cf6;
+    --heat-4: #c4b5fd;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 30px -8px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 30px 60px -18px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 0 1px rgba(167, 139, 250, 0.3), 0 12px 40px -10px rgba(139, 92, 246, 0.45);
   }
 }
 
 :root[data-theme="dark"] {
-  --color-accent: #2dd4bf;
-  --color-accent-hover: #5eead4;
-  --color-accent-soft: rgba(45, 212, 191, 0.14);
-  --color-accent-contrast: #08110f;
+  --color-accent: #a78bfa;
+  --color-accent-hover: #c4b5fd;
+  --color-accent-soft: rgba(167, 139, 250, 0.13);
+  --color-accent-contrast: #0b0817;
+  --color-accent-2: #22d3ee;
+  --color-accent-2-soft: rgba(34, 211, 238, 0.12);
+  --gradient-brand: linear-gradient(115deg, #8b5cf6 0%, #6366f1 45%, #06b6d4 100%);
+  --gradient-text: linear-gradient(100deg, #c4b5fd 0%, #818cf8 45%, #67e8f9 100%);
+  --aurora-1: rgba(124, 58, 237, 0.28);
+  --aurora-2: rgba(6, 182, 212, 0.18);
+  --aurora-3: rgba(236, 72, 153, 0.12);
 
   --color-success: #4ade80;
   --color-success-soft: rgba(74, 222, 128, 0.12);
   --color-danger: #f87171;
   --color-danger-soft: rgba(248, 113, 113, 0.12);
 
-  --color-bg: #0a0a0b;
-  --color-bg-subtle: #131316;
-  --color-bg-elevated: #19191c;
-  --color-bg-inverse: #f4f4f5;
-  --color-border: #26262a;
-  --color-border-strong: #38383e;
-  --color-text: #f4f4f5;
-  --color-text-secondary: #a3a3ab;
-  --color-text-tertiary: #6f6f78;
-  --color-scrim: rgba(0, 0, 0, 0.6);
+  --color-bg: #07060d;
+  --color-bg-subtle: #11101b;
+  --color-bg-elevated: #15131f;
+  --color-bg-inverse: #f4f3fb;
+  --color-border: #24212f;
+  --color-border-strong: #363246;
+  --color-text: #f4f3fb;
+  --color-text-secondary: #aba7bf;
+  --color-text-tertiary: #8a86a0;
+  --color-scrim: rgba(3, 2, 8, 0.65);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
+  --glass-bg: rgba(21, 19, 31, 0.62);
+  --glass-border: rgba(167, 139, 250, 0.12);
+
+  --heat-0: #1b1928;
+  --heat-1: #3b2a6b;
+  --heat-2: #5b3fb0;
+  --heat-3: #8b5cf6;
+  --heat-4: #c4b5fd;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 30px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 30px 60px -18px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 0 1px rgba(167, 139, 250, 0.3), 0 12px 40px -10px rgba(139, 92, 246, 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect x="8" y="8" width="176" height="176" rx="38" ry="38" fill="#0d9488"/>
+  <defs><linearGradient id="av-brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="0.55" stop-color="#4f46e5"/><stop offset="1" stop-color="#0891b2"/></linearGradient></defs>
+  <rect x="8" y="8" width="176" height="176" rx="38" ry="38" fill="url(#av-brand)"/>
   <g transform="translate(52, 50)" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
     <path d="M 0 92 L 28 0 L 56 92"/>
     <line x1="11" y1="60" x2="45" y2="60" stroke-width="10"/>

@@ -1,11 +1,11 @@
 /* Global reset lives in styles/base.css (loaded via App.css). This file only
    prevents a flash of unstyled content before the app bundle paints. */
 html {
-  background: #ffffff;
+  background: #faf9ff;
 }
 
 @media (prefers-color-scheme: dark) {
   html {
-    background: #0a0a0b;
+    background: #07060d;
   }
 }

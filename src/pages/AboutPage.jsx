@@ -5,7 +5,7 @@ import AboutSection from "../components/modern/AboutSection";
 
 const AboutPage = () => (
   <div>
-    <PageHeader title="About Me" subtitle="Get to know more about my background, skills, and passion for technology" />
+    <PageHeader kicker="~/about" title="About Me" subtitle="Get to know more about my background, skills, and passion for technology" />
     <Suspense fallback={<LoadingSpinner />}>
       <AboutSection />
     </Suspense>

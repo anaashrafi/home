@@ -1,7 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+// Firebase is only used for the footer visitor counter, so it is loaded lazily
+// (separate chunk, after the page is idle) instead of in the main bundle.
 
-// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDbKe1DCXrbKrVkLzpWQlWl1S3S1uDgmHA",
   authDomain: "anurag-portfolio-9a906.firebaseapp.com",
@@ -13,21 +12,23 @@ const firebaseConfig = {
   measurementId: "G-KZ467MRSBG"
 };
 
-let app = null;
-let database = null;
+let dbPromise = null;
 
-try {
-  // Initialize Firebase
-  app = initializeApp(firebaseConfig);
-  
-  // Initialize Realtime Database
-  database = getDatabase(app);
-  
-  console.log('✅ Firebase initialized successfully');
-} catch (error) {
-  console.warn('⚠️ Firebase initialization failed:', error.message);
-  console.log('📊 Using fallback visitor counter');
-}
-
-export { database };
-export default app;
+/** Resolves to { database, ref, onValue, runTransaction }; loads the SDK on first call. */
+export const loadDatabase = () => {
+  if (!dbPromise) {
+    dbPromise = Promise.all([
+      import(/* webpackChunkName: "firebase" */ 'firebase/app'),
+      import(/* webpackChunkName: "firebase" */ 'firebase/database'),
+    ]).then(([{ initializeApp }, db]) => {
+      const app = initializeApp(firebaseConfig);
+      return {
+        database: db.getDatabase(app),
+        ref: db.ref,
+        onValue: db.onValue,
+        runTransaction: db.runTransaction,
+      };
+    });
+  }
+  return dbPromise;
+};

@@ -1,33 +1,117 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Reveal from '../Reveal';
 import { web3formsAccessKey } from '../../editable-stuff/configurations.json';
+import { CONTACT_EMAIL, LINKS, LOCATION } from '../../data/profile';
 
-const CONTACT_METHODS = [
-  { icon: 'fas fa-envelope', title: 'Email', value: 'anuragvaidhya786@gmail.com', link: 'mailto:anuragvaidhya786@gmail.com', description: 'Send me an email anytime' },
-  { icon: 'fab fa-linkedin', title: 'LinkedIn', value: 'linkedin.com/in/anurag-vaidhya', link: 'https://www.linkedin.com/in/anurag-vaidhya-47b93222', description: 'Connect with me professionally' },
-  { icon: 'fab fa-github', title: 'GitHub', value: 'github.com/anuu1989', link: 'https://github.com/anuu1989', description: 'Check out my code' },
+const MAX_MESSAGE = 1000;
+const MIN_MESSAGE = 20;
+const DRAFT_KEY = 'contact-draft';
+const RESPONSE_TIME = 'I usually reply within 1–2 business days.';
+
+const SUBJECTS = [
+  { id: 'job', label: 'Job opportunity', icon: 'fas fa-briefcase' },
+  { id: 'consulting', label: 'Consulting', icon: 'fas fa-compass-drafting' },
+  { id: 'project', label: 'Collaboration', icon: 'fas fa-code-merge' },
+  { id: 'speaking', label: 'Speaking', icon: 'fas fa-microphone' },
+  { id: 'mentoring', label: 'Mentoring', icon: 'fas fa-seedling' },
+  { id: 'other', label: 'Just saying hi', icon: 'fas fa-hand' },
 ];
 
-const ContactSection = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+const EMPTY = { name: '', email: '', subject: '', message: '' };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+const validate = (data) => {
+  const errors = {};
+  if (!data.name.trim()) errors.name = 'Please tell me your name.';
+  if (!data.email.trim()) errors.email = 'I need an email to reply to.';
+  else if (!EMAIL_RE.test(data.email.trim())) errors.email = "That email doesn't look quite right.";
+  if (!data.subject) errors.subject = 'Pick what this is about.';
+  if (data.message.trim().length < MIN_MESSAGE) errors.message = `A little more detail please (at least ${MIN_MESSAGE} characters).`;
+  else if (data.message.length > MAX_MESSAGE) errors.message = `Please keep it under ${MAX_MESSAGE} characters.`;
+  return errors;
+};
+
+const loadDraft = () => {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? { ...EMPTY, ...JSON.parse(raw) } : EMPTY;
+  } catch {
+    return EMPTY;
+  }
+};
+
+const LocalTime = () => {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <span>
+      {now.toLocaleTimeString('en-AU', { timeZone: LOCATION.timeZone, hour: 'numeric', minute: '2-digit' })}
+      {' '}in {LOCATION.city}
+    </span>
+  );
+};
+
+const ContactSection = () => {
+  const [formData, setFormData] = useState(loadDraft);
+  const [touched, setTouched] = useState({});
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [toast, setToast] = useState(null);
+  const [botcheck, setBotcheck] = useState(false);
+
+  const errors = validate(formData);
+  const showError = (field) => touched[field] && errors[field];
+
+  // Autosave a draft so a refresh or accidental navigation doesn't lose the message.
+  useEffect(() => {
+    try {
+      if (status === 'success') localStorage.removeItem(DRAFT_KEY);
+      else localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+    } catch {
+      /* storage blocked — drafts are best-effort */
+    }
+  }, [formData, status]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const id = setTimeout(() => setToast(null), 2200);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  const setField = (name, value) => setFormData((d) => ({ ...d, [name]: value }));
+  const handleChange = (e) => setField(e.target.name, e.target.value);
+  const handleBlur = (e) => setTouched((t) => ({ ...t, [e.target.name]: true }));
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setToast('Email copied to clipboard');
+    } catch {
+      window.location.href = `mailto:${CONTACT_EMAIL}`;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
+    setTouched({ name: true, email: true, subject: true, message: true });
+    if (Object.keys(errors).length) {
+      const first = ['name', 'email', 'subject', 'message'].find((f) => errors[f]);
+      document.getElementById(`contact-${first}`)?.focus();
+      return;
+    }
+    if (botcheck) return;
+
+    const subjectLabel = SUBJECTS.find((s) => s.id === formData.subject)?.label || formData.subject;
+    setStatus('sending');
 
     try {
       if (!web3formsAccessKey) {
-        const mailtoLink = `mailto:anuragvaidhya786@gmail.com?subject=${encodeURIComponent(`Contact Form: ${formData.subject}`)}&body=${encodeURIComponent(
-          `Name: ${formData.name}\nEmail: ${formData.email}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}`
+        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Contact: ${subjectLabel}`)}&body=${encodeURIComponent(
+          `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
         )}`;
-        window.location.href = mailtoLink;
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setStatus('success');
         return;
       }
 
@@ -38,109 +122,165 @@ const ContactSection = () => {
           access_key: web3formsAccessKey,
           name: formData.name,
           email: formData.email,
-          subject: `Portfolio Contact: ${formData.subject}`,
+          subject: `Portfolio Contact: ${subjectLabel}`,
           message: formData.message,
           from_name: formData.name,
           replyto: formData.email,
+          botcheck: false,
         }),
       });
-
       const result = await response.json();
-      if (result.success) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        setTimeout(() => setSubmitStatus(null), 5000);
-      } else {
-        setSubmitStatus('error');
-      }
-    } catch (err) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
+      setStatus(result.success ? 'success' : 'error');
+    } catch {
+      setStatus('error');
     }
   };
 
+  const reset = () => {
+    setFormData(EMPTY);
+    setTouched({});
+    setStatus('idle');
+  };
+
+  const messageLength = formData.message.length;
+
   return (
     <div className="container">
-      <Reveal as="section" className="section" style={{ paddingTop: 0 }}>
-        <div className="grid grid-3">
-          {CONTACT_METHODS.map((method) => (
-            <a key={method.title} href={method.link} target={method.link.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" className="card card-hover contact-method-card">
-              <i className={method.icon} aria-hidden="true"></i>
-              <h3>{method.title}</h3>
-              <p>{method.description}</p>
-            </a>
-          ))}
-        </div>
-      </Reveal>
+      <Reveal as="section" className="contact-layout">
+        {/* Left: direct channels */}
+        <aside className="contact-aside">
+          <div className="card card-pad contact-email-card">
+            <span className="contact-label">Fastest way</span>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="contact-email">{CONTACT_EMAIL}</a>
+            <div className="cluster" style={{ '--gap': '0.5rem', marginTop: 'var(--space-sm)' }}>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={copyEmail}>
+                <i className="fas fa-copy" aria-hidden="true"></i> Copy
+              </button>
+              <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-ghost btn-sm">
+                <i className="fas fa-envelope-open" aria-hidden="true"></i> Open mail app
+              </a>
+            </div>
+          </div>
 
-      <Reveal as="section" className="section-sm">
+          <a href={LINKS.calendly} target="_blank" rel="noopener noreferrer" className="card card-hover card-pad contact-row">
+            <span className="icon-tile"><i className="fas fa-calendar-check" aria-hidden="true"></i></span>
+            <span><strong>Book a 30-min call</strong><small>Pick a slot on Calendly</small></span>
+            <i className="fas fa-arrow-up-right-from-square contact-row-arrow" aria-hidden="true"></i>
+          </a>
+          <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="card card-hover card-pad contact-row">
+            <span className="icon-tile"><i className="fab fa-linkedin" aria-hidden="true"></i></span>
+            <span><strong>LinkedIn</strong><small>Connect professionally</small></span>
+            <i className="fas fa-arrow-up-right-from-square contact-row-arrow" aria-hidden="true"></i>
+          </a>
+          <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="card card-hover card-pad contact-row">
+            <span className="icon-tile"><i className="fab fa-github" aria-hidden="true"></i></span>
+            <span><strong>GitHub</strong><small>See what I'm building</small></span>
+            <i className="fas fa-arrow-up-right-from-square contact-row-arrow" aria-hidden="true"></i>
+          </a>
+
+          <div className="contact-meta">
+            <p><i className="fas fa-clock" aria-hidden="true"></i> <LocalTime /></p>
+            <p><i className="fas fa-reply" aria-hidden="true"></i> {RESPONSE_TIME}</p>
+          </div>
+        </aside>
+
+        {/* Right: form */}
         <div className="card contact-form-card">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>Send a Message</h2>
-
-          {submitStatus === 'success' && (
-            <div className="form-status success" style={{ marginBottom: 'var(--space-md)' }}>
-              <i className="fas fa-check-circle" aria-hidden="true"></i>
-              Thank you! Your message has been sent successfully. I'll get back to you soon.
+          {status === 'success' ? (
+            <div className="contact-success" role="status">
+              <span className="contact-success-icon"><i className="fas fa-check" aria-hidden="true"></i></span>
+              <h2>Message sent.</h2>
+              <p>Thanks{formData.name ? `, ${formData.name.split(' ')[0]}` : ''}! {RESPONSE_TIME}</p>
+              <button type="button" className="btn btn-secondary" onClick={reset}>Send another</button>
             </div>
-          )}
-          {submitStatus === 'error' && (
-            <div className="form-status error" style={{ marginBottom: 'var(--space-md)' }}>
-              <i className="fas fa-exclamation-circle" aria-hidden="true"></i>
-              Oops! Something went wrong. Please email me directly at anuragvaidhya786@gmail.com
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="stack" style={{ '--gap': 'var(--space-md)' }}>
-            <div className="contact-form-row">
-              <div className="form-field">
-                <label htmlFor="name" className="form-label">Full Name *</label>
-                <input type="text" id="name" name="name" className="form-input" value={formData.name} onChange={handleChange} required placeholder="Your full name" />
+          ) : (
+            <form onSubmit={handleSubmit} noValidate className="stack" style={{ '--gap': 'var(--space-md)' }}>
+              <div>
+                <h2 className="contact-form-title">Send a message</h2>
+                <p className="contact-form-sub">Your draft saves automatically while you type.</p>
               </div>
-              <div className="form-field">
-                <label htmlFor="email" className="form-label">Email Address *</label>
-                <input type="email" id="email" name="email" className="form-input" value={formData.email} onChange={handleChange} required placeholder="your.email@example.com" />
-              </div>
-            </div>
 
-            <div className="form-field">
-              <label htmlFor="subject" className="form-label">Subject *</label>
-              <select id="subject" name="subject" className="form-select" value={formData.subject} onChange={handleChange} required>
-                <option value="">Select a subject</option>
-                <option value="project">Project Collaboration</option>
-                <option value="consulting">Consulting Opportunity</option>
-                <option value="job">Job Opportunity</option>
-                <option value="speaking">Speaking Engagement</option>
-                <option value="mentoring">Mentoring Request</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="message" className="form-label">Message *</label>
-              <textarea id="message" name="message" className="form-textarea" value={formData.message} onChange={handleChange} required placeholder="Tell me about your project, idea, or how I can help you..."></textarea>
-            </div>
-
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ width: '100%', padding: '0.9rem' }}>
-              {isSubmitting ? (
-                <>Sending&hellip;</>
-              ) : (
-                <><i className="fas fa-paper-plane" aria-hidden="true"></i> Send Message</>
+              {status === 'error' && (
+                <div className="form-status error" role="alert">
+                  <i className="fas fa-exclamation-circle" aria-hidden="true"></i>
+                  Something went wrong sending that. Please email me directly at {CONTACT_EMAIL}.
+                </div>
               )}
-            </button>
-          </form>
+
+              <fieldset className="form-field contact-subjects">
+                <legend className="form-label">What's this about?</legend>
+                <div className="chip-group" id="contact-subject" tabIndex={-1}>
+                  {SUBJECTS.map((s) => (
+                    <label key={s.id} className={`chip ${formData.subject === s.id ? 'selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name="subject"
+                        value={s.id}
+                        checked={formData.subject === s.id}
+                        onChange={(e) => { handleChange(e); setTouched((t) => ({ ...t, subject: true })); }}
+                      />
+                      <i className={s.icon} aria-hidden="true"></i> {s.label}
+                    </label>
+                  ))}
+                </div>
+                {showError('subject') && <span className="form-error">{errors.subject}</span>}
+              </fieldset>
+
+              <div className="contact-form-row">
+                <div className={`form-field ${showError('name') ? 'has-error' : ''}`}>
+                  <label htmlFor="contact-name" className="form-label">Name</label>
+                  <input
+                    type="text" id="contact-name" name="name" className="form-input" autoComplete="name"
+                    value={formData.name} onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={!!showError('name')} aria-describedby="contact-name-err" placeholder="Jane Doe"
+                  />
+                  {showError('name') && <span id="contact-name-err" className="form-error">{errors.name}</span>}
+                </div>
+                <div className={`form-field ${showError('email') ? 'has-error' : ''}`}>
+                  <label htmlFor="contact-email" className="form-label">Email</label>
+                  <input
+                    type="email" id="contact-email" name="email" className="form-input" autoComplete="email"
+                    value={formData.email} onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={!!showError('email')} aria-describedby="contact-email-err" placeholder="jane@company.com"
+                  />
+                  {showError('email') && <span id="contact-email-err" className="form-error">{errors.email}</span>}
+                </div>
+              </div>
+
+              <div className={`form-field ${showError('message') ? 'has-error' : ''}`}>
+                <div className="spread">
+                  <label htmlFor="contact-message" className="form-label">Message</label>
+                  <span className={`char-count ${messageLength > MAX_MESSAGE ? 'over' : messageLength > MAX_MESSAGE * 0.9 ? 'near' : ''}`}>
+                    {messageLength}/{MAX_MESSAGE}
+                  </span>
+                </div>
+                <textarea
+                  id="contact-message" name="message" className="form-textarea"
+                  value={formData.message} onChange={handleChange} onBlur={handleBlur}
+                  aria-invalid={!!showError('message')} aria-describedby="contact-message-err"
+                  placeholder="What are you working on, and how can I help?"
+                ></textarea>
+                {showError('message') && <span id="contact-message-err" className="form-error">{errors.message}</span>}
+              </div>
+
+              {/* Honeypot: hidden from people, tempting to bots */}
+              <input type="checkbox" name="botcheck" className="sr-only" tabIndex={-1} autoComplete="off" checked={botcheck} onChange={(e) => setBotcheck(e.target.checked)} aria-hidden="true" />
+
+              <button type="submit" className="btn btn-primary contact-submit" disabled={status === 'sending'}>
+                {status === 'sending' ? (
+                  <><span className="btn-spinner" aria-hidden="true" /> Sending…</>
+                ) : (
+                  <>Send message <i className="fas fa-paper-plane" aria-hidden="true"></i></>
+                )}
+              </button>
+            </form>
+          )}
         </div>
       </Reveal>
 
-      <Reveal as="section" className="section-sm contact-cta card">
-        <h3 style={{ fontSize: 'var(--fs-lg)', marginBottom: 'var(--space-2xs)' }}>Prefer a Different Approach?</h3>
-        <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-md)' }}>
-          I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology.
-        </p>
-        <a href="https://calendly.com/anuragvaidhya786" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-          <i className="fas fa-calendar" aria-hidden="true"></i> Schedule a Call
-        </a>
-      </Reveal>
+      <div className={`toast ${toast ? 'show' : ''}`} role="status" aria-live="polite">
+        <i className="fas fa-check-circle" aria-hidden="true"></i> {toast}
+      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ const Skills = React.lazy(() => import("../components/home/Skills"));
 
 const SkillsPage = () => (
   <div>
-    <PageHeader title="Skills & Expertise" subtitle="15+ years of hands-on technical skills, core responsibilities, leadership, and certifications across the full stack" />
+    <PageHeader kicker="~/skills" title="Skills & Expertise" subtitle="Cloud first — AWS, then GCP and Azure — followed by platform engineering, DevOps and DevSecOps. Everything else builds on those four." />
     <Suspense fallback={<LoadingSpinner />}>
       <Skills />
     </Suspense>

@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { analyticsAPI } from '../services/api';
 import ReactGA from 'react-ga4';
 
 // Initialize Google Analytics (call this once in your app)

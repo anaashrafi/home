@@ -1,15 +1,19 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
-import { act } from "react-dom/test-utils";
+import { render, screen, cleanup } from "@testing-library/react";
 import App from "./App";
 
-it("renders without crashing", () => {
-  const div = document.createElement("div");
-  const root = createRoot(div);
-  act(() => {
-    root.render(<App />);
-  });
-  act(() => {
-    root.unmount();
-  });
+beforeEach(() => {
+  // Keep the smoke test offline: GitHub calls fail fast and fall back to their error states.
+  global.fetch = jest.fn(() => Promise.reject(new Error("offline")));
+});
+
+afterEach(async () => {
+  cleanup();
+  // Let any already-scheduled React work flush before jsdom is torn down.
+  await new Promise((r) => setTimeout(r, 0));
+});
+
+it("renders the home page without crashing", async () => {
+  render(<App />);
+  expect(await screen.findByRole("heading", { level: 1 }, { timeout: 4000 })).toBeInTheDocument();
 });

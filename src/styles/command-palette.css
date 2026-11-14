@@ -20,7 +20,7 @@
 
 .cmdk-panel {
   width: 100%;
-  max-width: 560px;
+  max-width: 620px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -71,7 +71,7 @@
 }
 
 .cmdk-list {
-  max-height: 360px;
+  max-height: min(420px, 55vh);
   overflow-y: auto;
   padding: var(--space-2xs);
 }
@@ -103,13 +103,72 @@
 
 .cmdk-item-label {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   font-size: var(--fs-sm);
   font-weight: 500;
 }
 
+.cmdk-item-label mark {
+  background: transparent;
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-soft);
+  text-underline-offset: 3px;
+}
+
 .cmdk-item-hint {
   font-size: var(--fs-xs);
+  font-weight: 400;
   color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmdk-item-type {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-text-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 0.1rem 0.5rem;
+  flex-shrink: 0;
+}
+
+.cmdk-enter {
+  font-size: 0.75rem;
+  color: var(--color-accent);
+  transform: rotate(90deg);
+}
+
+.cmdk-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.6rem var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary);
+}
+
+.cmdk-footer kbd {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0 0.3rem;
+  margin-right: 3px;
+}
+
+.cmdk-footer-count {
+  margin-left: auto;
+}
+
+@media (max-width: 520px) {
+  .cmdk-footer span:not(.cmdk-footer-count) { display: none; }
 }
 
 .cmdk-item.active {
@@ -121,8 +180,16 @@
 }
 
 .cmdk-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   padding: var(--space-lg);
   text-align: center;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   font-size: var(--fs-sm);
+}
+
+.cmdk-empty span {
+  color: var(--color-text-tertiary);
+  font-size: var(--fs-xs);
 }

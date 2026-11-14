@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Reveal from "../Reveal";
 import CountUp from "../CountUp";
 
@@ -16,18 +17,9 @@ const AREAS = [
   { title: "Strategic Vision", icon: "fas fa-lightbulb", description: "Developing and executing strategic initiatives that align with business objectives and drive growth.", achievements: ["Defined technology roadmaps", "Led digital transformation", "Optimized operational efficiency", "Delivered strategic projects"] },
 ];
 
-const JOURNEY = [
-  { company: "Wipro Technologies", role: "Senior Consultant & Team Lead", period: "2011-2020", highlights: ["Cultivated culture of inclusivity and collaboration", "Led new member onboarding and mentoring programs", "Organized technology training on niche skills", "Conducted social cause events (food wastage awareness)"] },
-  { company: "Cognizant Technology Solutions", role: "Senior Engineer & Community Leader", period: "2020-2022", highlights: ["Led community goal-setting and achievement programs", "Organized tech conferences and knowledge sharing events", "Guided team members in career development", "Built cross-team collaboration frameworks"] },
-  { company: "Accenture", role: "Engineering Lead", period: "2023-2025", highlights: ["Leading engineering teams in cloud transformation", "Driving platform modernization initiatives", "Mentoring senior engineers and architects", "Establishing engineering excellence standards"] },
-  { company: "Thoughtworks", role: "Lead Consultant", period: "Aug 2025 - Nov 2025", highlights: ["Championed agile methodologies and DevOps practices", "Led cross-functional teams in digital transformation projects", "Mentored consultants on technical excellence and client engagement", "Drove innovation through technology radar and best practices"] },
-  { company: "Australia Post", role: "Engineer - Platform, DevOps and Cloud", period: "Jan 2026 - Present", highlights: ["Leading platform engineering and cloud infrastructure modernization", "Implementing scalable DevOps practices for national postal operations", "Driving digital transformation initiatives across the organization", "Establishing cloud-native architecture and observability practices"] },
-];
-
 const TABS = [
   { id: "philosophy", icon: "fas fa-lightbulb", label: "Philosophy" },
   { id: "areas", icon: "fas fa-cogs", label: "Core Areas" },
-  { id: "journey", icon: "fas fa-route", label: "Journey" },
 ];
 
 const Leadership = () => {
@@ -96,27 +88,19 @@ const Leadership = () => {
           </div>
         )}
 
-        {activeTab === "journey" && (
-          <div className="timeline">
-            {JOURNEY.map((j) => (
-              <div key={j.company} className="timeline-item">
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--fs-xs)", color: "var(--color-text-tertiary)" }}>{j.period}</span>
-                <h4 style={{ fontSize: "var(--fs-md)", marginTop: "var(--space-3xs)" }}>{j.company}</h4>
-                <p style={{ fontSize: "var(--fs-sm)", color: "var(--color-text-secondary)", marginBottom: "var(--space-2xs)" }}>{j.role}</p>
-                <ul className="stack" style={{ '--gap': '0.3rem' }}>
-                  {j.highlights.map((h) => (
-                    <li key={h} className="cluster" style={{ '--gap': '0.5rem', fontSize: "var(--fs-sm)", flexWrap: "nowrap", alignItems: "flex-start" }}>
-                      <i className="fas fa-star" style={{ color: "var(--color-accent)", fontSize: "0.75rem" }} aria-hidden="true"></i> {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
       </Reveal>
 
-      <Reveal as="section" className="section-sm card card-pad" style={{ padding: "var(--space-lg)" }}>
+      <Reveal as="section" className="card card-pad leadership-journey-cta">
+        <div>
+          <h3>Leadership journey, role by role</h3>
+          <p>The leadership highlights from each company now live inside the interactive career timeline.</p>
+        </div>
+        <Link to="/experience" className="btn btn-primary">
+          Open the timeline <i className="fas fa-arrow-right" aria-hidden="true"></i>
+        </Link>
+      </Reveal>
+
+      <Reveal as="section" className="section-sm card card-pad" style={{ padding: "var(--space-lg)", marginTop: "var(--space-lg)" }}>
         <div className="stat-grid">
           <div className="stat"><span className="stat-number"><CountUp end={40} suffix="%" /></span><span className="stat-label">Productivity Increase</span></div>
           <div className="stat"><span className="stat-number"><CountUp end={95} suffix="%" /></span><span className="stat-label">Team Retention</span></div>

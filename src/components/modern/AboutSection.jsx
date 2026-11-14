@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Reveal from '../Reveal';
 import CountUp from '../CountUp';
-import profileImg from '../../editable-stuff/asset/images/profile.jpg';
-import { gitHubLink, gitHubUsername, gitHubQuerry } from '../../editable-stuff/configurations.json';
+import { gitHubUsername } from '../../editable-stuff/configurations.json';
+import { fetchRepos } from '../../hooks/useGitHub';
+import { SUMMARY, FOCUS_AREAS, CERTIFICATIONS, yearsOfExperience } from '../../data/profile';
 
 const TIME_ZONE = 'Australia/Melbourne';
 
@@ -11,21 +12,24 @@ const formatLocalTime = () =>
   new Intl.DateTimeFormat('en-AU', { hour: 'numeric', minute: '2-digit', timeZone: TIME_ZONE }).format(new Date());
 
 const HIGHLIGHTS = [
-  { icon: 'fas fa-trophy', title: 'Leadership Excellence', description: 'Led 15+ person engineering teams across multiple time zones, managing $2M+ budgets and delivering critical infrastructure projects.', metric: '15+ Teams Led' },
-  { icon: 'fas fa-rocket', title: 'Performance Impact', description: 'Reduced deployment time by 40% and improved system reliability to 99.9% uptime through automation and best practices.', metric: '40% Faster Delivery' },
-  { icon: 'fas fa-users-cog', title: 'Talent Development', description: 'Mentored 25+ engineers, developed training programs, and built high-performing teams that consistently exceed targets.', metric: '25+ Engineers Mentored' },
-  { icon: 'fas fa-shield-alt', title: 'Security & Compliance', description: 'Implemented enterprise-grade security practices, achieving SOC2 compliance and zero security incidents.', metric: 'Zero Security Incidents' },
-  { icon: 'fas fa-cloud', title: 'Cloud Transformation', description: 'Architected and migrated 50+ applications to cloud-native solutions, reducing infrastructure costs by 30%.', metric: '50+ Apps Migrated' },
-  { icon: 'fas fa-lightbulb', title: 'Innovation & Growth', description: 'Continuously learning and adapting to emerging technologies, implementing cutting-edge solutions, and fostering innovation mindset across teams.', metric: 'Always Learning' },
+  { icon: 'fas fa-cloud', title: 'Cloud Governance at Scale', description: 'Allow-list Service Control Policies across the AWS organisation, an AWS Service Catalog offering, and multi-account landing zones on AWS and GCP.', metric: 'AWS-first, multi-cloud' },
+  { icon: 'fas fa-layer-group', title: 'Platform Engineering', description: 'Secure OpenShift, EKS and GKE platforms with Istio, RBAC and OPA Gatekeeper, plus developer self-service within policy-governed guardrails.', metric: 'Kubernetes · OpenShift' },
+  { icon: 'fas fa-shield-halved', title: 'DevSecOps & Supply Chain', description: 'SAST, DAST, SCA, SBOM and image signing embedded in CI/CD, with continuous CSPM against CIS, ISO 27001, SOC2, NIST and PCI-DSS.', metric: 'Security by default' },
+  { icon: 'fas fa-robot', title: 'Secure AI Platforms', description: 'Reference architecture for agentic AI on AWS Bedrock AgentCore with Guardrails, WAF, multi-provider authorisers and RAG on OpenSearch Serverless.', metric: 'Bedrock · RAG' },
+  { icon: 'fas fa-route', title: 'Cloud Migration', description: 'Led a Migration Acceleration Program assessment for 50+ workloads, with wave sequencing, risk analysis and right-sizing recommendations.', metric: '50+ Workloads Assessed' },
+  { icon: 'fas fa-users-cog', title: 'Teams & Culture', description: 'Built, hired and scaled Platform Engineering and DevSecOps teams; coaching engineers through workshops and design reviews.', metric: 'Automation-first culture' },
 ];
 
 const COMPETENCIES = [
-  { category: 'Cloud & Infrastructure', icon: 'fas fa-cloud', skills: ['AWS', 'Azure', 'GCP', 'Kubernetes', 'Docker', 'Terraform', 'CloudFormation', 'Helm'] },
-  { category: 'DevOps & Automation', icon: 'fas fa-cogs', skills: ['CI/CD', 'Jenkins', 'GitLab CI', 'GitHub Actions', 'Ansible', 'Chef', 'Puppet', 'ArgoCD'] },
-  { category: 'Programming & Development', icon: 'fas fa-code', skills: ['Java', 'Python', 'Node.js', 'JavaScript', 'Go', 'Shell Scripting', 'React', 'Spring Boot'] },
-  { category: 'Monitoring & Observability', icon: 'fas fa-chart-line', skills: ['Prometheus', 'Grafana', 'ELK Stack', 'Datadog', 'New Relic', 'Splunk', 'Jaeger', 'OpenTelemetry'] },
-  { category: 'Security & Compliance', icon: 'fas fa-shield-alt', skills: ['DevSecOps', 'OWASP', 'SOC2', 'GDPR', 'Vault', 'SAST', 'DAST', 'Penetration Testing'] },
-  { category: 'Leadership & Management', icon: 'fas fa-users', skills: ['Team Leadership', 'Agile/Scrum', 'Strategic Planning', 'Mentoring', 'Stakeholder Management', 'Budget Management', 'Change Management', 'Performance Management'] },
+  { category: 'Cloud Platforms', icon: 'fas fa-cloud', skills: ['AWS (primary)', 'GCP', 'Azure', 'Multi-cloud & Hybrid', 'AWS Organizations', 'SCPs'] },
+  { category: 'Platform & Containers', icon: 'fas fa-layer-group', skills: ['Kubernetes', 'EKS', 'GKE', 'OpenShift', 'ECS Fargate', 'Docker', 'Helm', 'Istio'] },
+  { category: 'IaC & Automation', icon: 'fas fa-code-branch', skills: ['Terraform', 'Terraform Cloud', 'CloudFormation', 'CDK', 'Pulumi'] },
+  { category: 'CI/CD & Secrets', icon: 'fas fa-infinity', skills: ['GitHub Actions', 'GitLab CI', 'Jenkins', 'CircleCI', 'ArgoCD', 'Vault'] },
+  { category: 'DevSecOps & Compliance', icon: 'fas fa-shield-halved', skills: ['SAST/DAST/SCA', 'OPA', 'Checkov', 'CSPM', 'SBOM', 'Zero-Trust IAM', 'ISO 27001', 'SOC2', 'NIST', 'PCI-DSS'] },
+  { category: 'AI Platforms & Security', icon: 'fas fa-robot', skills: ['AWS Bedrock', 'AgentCore', 'Guardrails', 'Knowledge Bases', 'RAG', 'OpenSearch Serverless'] },
+  { category: 'AWS Services', icon: 'fab fa-aws', skills: ['ECS Fargate', 'Lambda', 'API Gateway', 'ALB', 'WAF', 'DynamoDB', 'KMS', 'AWS Backup', 'Service Catalog', 'Secrets Manager', 'Cognito'] },
+  { category: 'Observability', icon: 'fas fa-chart-line', skills: ['Dynatrace', 'Splunk', 'Prometheus', 'Grafana', 'ELK', 'OpenTelemetry', 'CloudWatch', 'X-Ray'] },
+  { category: 'Scripting & Dev', icon: 'fas fa-terminal', skills: ['Python', 'Go', 'Bash', 'REST', 'GraphQL', 'gRPC'] },
 ];
 
 const AboutSection = () => {
@@ -40,11 +44,9 @@ const AboutSection = () => {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${gitHubLink}${gitHubUsername}${gitHubQuerry}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((repos) => {
-        if (cancelled || !Array.isArray(repos)) return;
-        const owned = repos.filter((r) => !r.fork);
+    fetchRepos()
+      .then((owned) => {
+        if (cancelled || !owned.length) return;
         const stars = owned.reduce((sum, r) => sum + r.stargazers_count, 0);
         const latest = owned.reduce((a, b) => (new Date(a.updated_at) > new Date(b.updated_at) ? a : b), owned[0]);
         setGh({ repoCount: owned.length, stars, latestName: latest?.name, latestDate: latest?.updated_at });
@@ -65,14 +67,19 @@ const AboutSection = () => {
     <Reveal className="section" style={{ paddingTop: 0 }}>
       <div className="about-hero-grid">
         <img
-          src={profileImg}
+          src="/profile.webp"
+          width={220}
+          height={220}
+          decoding="async"
           alt="Anurag Vaidhya"
           style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}
           onError={(e) => { e.target.src = '/profile.jpg'; }}
         />
         <div>
           <h1 style={{ fontSize: 'var(--fs-2xl)' }}>Anurag Vaidhya</h1>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--fs-md)', marginTop: 'var(--space-3xs)' }}>Senior Technologist and Tech Leader</p>
+          <div className="tag-list" style={{ marginTop: 'var(--space-xs)' }}>
+            {FOCUS_AREAS.map((f, i) => <span key={f.id} className={`tag ${i === 0 ? 'tag-accent' : ''}`}>{i === 0 ? 'Cloud: AWS · GCP · Azure' : f.label}</span>)}
+          </div>
 
           <div className="cluster" style={{ '--gap': 'var(--space-sm)', marginTop: 'var(--space-2xs)', fontSize: 'var(--fs-sm)', color: 'var(--color-text-tertiary)' }}>
             <span><i className="fas fa-map-marker-alt" aria-hidden="true"></i> Melbourne, Australia</span>
@@ -83,9 +90,9 @@ const AboutSection = () => {
           </div>
 
           <div className="stat-grid" style={{ margin: 'var(--space-md) 0' }}>
-            <div className="stat"><span className="stat-number"><CountUp end={15} suffix="+" /></span><span className="stat-label">Years Experience</span></div>
-            <div className="stat"><span className="stat-number"><CountUp end={25} suffix="+" /></span><span className="stat-label">Engineers Mentored</span></div>
-            <div className="stat"><span className="stat-number"><CountUp end={100} suffix="+" /></span><span className="stat-label">Projects Delivered</span></div>
+            <div className="stat"><span className="stat-number"><CountUp end={yearsOfExperience()} suffix="+" /></span><span className="stat-label">Years Experience</span></div>
+            <div className="stat"><span className="stat-number"><CountUp end={3} /></span><span className="stat-label">Clouds: AWS, GCP, Azure</span></div>
+            <div className="stat"><span className="stat-number"><CountUp end={CERTIFICATIONS.length} /></span><span className="stat-label">Certifications</span></div>
           </div>
 
           <div className="cluster">
@@ -104,23 +111,9 @@ const AboutSection = () => {
     </Reveal>
 
     <Reveal as="section" className="section-sm stack" style={{ '--gap': 'var(--space-sm)', maxWidth: 760 }}>
-      <p style={{ color: 'var(--color-text-secondary)', lineHeight: 'var(--lh-normal)' }}>
-        Strategic and hands-on technology leader with 15+ years of experience across DevSecOps,
-        platform engineering, and cloud infrastructure. Known for bridging the gap between engineering
-        strategy and execution&mdash;designing and delivering secure, scalable, and high-performing platforms
-        that enable speed, stability, and innovation at scale.
-      </p>
-      <p style={{ color: 'var(--color-text-secondary)', lineHeight: 'var(--lh-normal)' }}>
-        Deeply hands-on with modern cloud-native technologies, CI/CD, Kubernetes, infrastructure as code,
-        observability, and security automation. Proven ability to roll up sleeves when needed&mdash;whether
-        architecting resilient cloud systems, optimizing platform performance, or driving incident
-        response&mdash;while mentoring teams and shaping long-term engineering vision.
-      </p>
-      <p style={{ color: 'var(--color-text-secondary)', lineHeight: 'var(--lh-normal)' }}>
-        A trusted leader at the intersection of cloud, security, and automation. Adept at aligning
-        engineering priorities with business objectives, embedding security into the software lifecycle,
-        and cultivating high-impact teams that deliver value fast and safely.
-      </p>
+      {SUMMARY.map((para) => (
+        <p key={para.slice(0, 24)} style={{ color: 'var(--color-text-secondary)', lineHeight: 'var(--lh-normal)', fontSize: 'var(--fs-md)' }}>{para}</p>
+      ))}
     </Reveal>
 
     <Reveal as="section" className="section-sm">
@@ -176,10 +169,12 @@ const AboutSection = () => {
             <span className="stat-number"><CountUp end={gh.repoCount} suffix="+" /></span>
             <span className="stat-label">Public Repos</span>
           </div>
-          <div className="stat">
-            <span className="stat-number"><CountUp end={gh.stars} /></span>
-            <span className="stat-label">Stars Earned</span>
-          </div>
+          {gh.stars > 0 && (
+            <div className="stat">
+              <span className="stat-number"><CountUp end={gh.stars} /></span>
+              <span className="stat-label">Stars Earned</span>
+            </div>
+          )}
           {gh.latestName && (
             <div className="stat">
               <span className="stat-number" style={{ fontSize: 'var(--fs-md)', fontFamily: 'var(--font-mono)' }}>{gh.latestName}</span>

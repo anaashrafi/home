@@ -27,17 +27,31 @@
   transform: translateY(0);
 }
 
+.btn {
+  border-radius: var(--radius-full);
+}
+
 .btn-primary {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  position: relative;
+  background: var(--gradient-brand);
+  background-size: 160% 100%;
+  background-position: 0% 50%;
+  color: #ffffff;
+  box-shadow: 0 8px 24px -10px rgba(109, 40, 217, 0.7);
+  transition: transform var(--duration-fast) var(--ease-out),
+              background-position var(--duration-slow) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
 }
 
 .btn-primary:hover {
-  background: var(--color-accent-hover);
+  background-position: 100% 50%;
+  box-shadow: 0 12px 32px -10px rgba(109, 40, 217, 0.85);
 }
 
 .btn-secondary {
-  background: transparent;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--color-text);
   border-color: var(--color-border-strong);
 }
@@ -74,10 +88,13 @@
   transform: none;
 }
 
-/* Cards */
+/* Cards — glass surface with a gradient edge that lights up on hover */
 .card {
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: transform var(--duration-base) var(--ease-out),
@@ -85,10 +102,28 @@
               border-color var(--duration-base) var(--ease-out);
 }
 
+.card-hover::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--gradient-brand);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+  pointer-events: none;
+}
+
 .card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-border-strong);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-hover:hover::before {
+  opacity: 1;
 }
 
 .card-pad {
@@ -156,8 +191,9 @@
 }
 
 .stat-number {
+  font-family: var(--font-display);
   font-size: var(--fs-xl);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-text);
   font-variant-numeric: tabular-nums;
@@ -208,6 +244,39 @@
   border-bottom-color: var(--color-accent);
 }
 
+/* Segmented pill control — the new default for in-page filters */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+}
+
+.segmented button {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.segmented button:hover {
+  color: var(--color-text);
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--color-bg-elevated);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--color-border);
+}
+
 /* Progress bar (skill levels) */
 .progress {
   height: 6px;
@@ -219,7 +288,7 @@
 .progress-fill {
   height: 100%;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
+  background: var(--gradient-brand);
   transition: width 900ms var(--ease-out);
 }
 
@@ -374,6 +443,19 @@
 
 .page-header h1 {
   font-size: var(--fs-3xl);
+  margin-bottom: var(--space-sm);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 0.08em;
+}
+
+.page-header .page-kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-text-tertiary);
   margin-bottom: var(--space-xs);
 }
 
@@ -516,7 +598,7 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-sm);
-  background: var(--color-accent-soft);
+  background: linear-gradient(135deg, var(--color-accent-soft), var(--color-accent-2-soft));
   color: var(--color-accent);
   font-size: 1.1rem;
   flex-shrink: 0;

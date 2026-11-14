@@ -1,14 +1,19 @@
 import React, { Suspense } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
+import { yearsOfExperience } from "../data/profile";
 
-const Experience = React.lazy(() => import("../components/home/Experience"));
+const CareerTimeline = React.lazy(() => import("../components/experience/CareerTimeline"));
 
 const ExperiencePage = () => (
   <div>
-    <PageHeader title="Professional Experience" subtitle="15+ years of progressive growth through different roles and companies in the tech industry" />
+    <PageHeader
+      kicker="~/experience"
+      title="Career Timeline"
+      subtitle={`${yearsOfExperience()}+ years from test automation to platform engineering. Filter by domain or expand a role for the leadership story behind it.`}
+    />
     <Suspense fallback={<LoadingSpinner />}>
-      <Experience />
+      <CareerTimeline />
     </Suspense>
   </div>
 );

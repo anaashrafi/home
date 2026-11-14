@@ -27,7 +27,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 const Blog = showBlog ? lazy(() => import("./components/blog/Blog")) : null;
 const BlogPost = showBlog ? lazy(() => import("./components/blog/BlogPost")) : null;
 
-const PageWrapper = ({ children }) => <main className="main-content">{children}</main>;
+const PageWrapper = ({ children }) => <main id="main-content" className="main-content" tabIndex={-1}>{children}</main>;
 
 const NotFound = () => {
   useDocumentTitle('Page Not Found');

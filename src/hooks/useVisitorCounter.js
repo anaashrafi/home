@@ -1,109 +1,98 @@
 import { useState, useEffect } from 'react';
-import { database } from '../config/firebase';
-import { ref, onValue, runTransaction } from 'firebase/database';
+import { loadDatabase } from '../config/firebase';
+
+const BASE_COUNT = 3450;
+
+/** Counts one visit per browser per day; true when this page view should increment. */
+const shouldCountVisit = () => {
+  try {
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem('portfolio_last_visit');
+    const sessionId = localStorage.getItem('portfolio_session_id');
+    if (sessionId && lastVisit === today) return { increment: false, isNew: false };
+    localStorage.setItem('portfolio_last_visit', today);
+    localStorage.setItem('portfolio_session_id', Date.now().toString());
+    return { increment: true, isNew: !sessionId || !lastVisit };
+  } catch {
+    return { increment: false, isNew: false };
+  }
+};
+
+// Decide once per page load (StrictMode runs effects twice in development).
+let visitDecision = null;
+const getVisitDecision = () => visitDecision || (visitDecision = shouldCountVisit());
+
+const fallbackCount = (increment) => {
+  const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+  return BASE_COUNT + Math.floor((daysSinceEpoch - 19700) * 2.5) + (increment ? 1 : 0);
+};
+
+// Defer non-critical work until the browser is idle (or 2s, whichever first).
+const whenIdle = (fn) => {
+  if ('requestIdleCallback' in window) {
+    const id = window.requestIdleCallback(fn, { timeout: 2000 });
+    return () => window.cancelIdleCallback(id);
+  }
+  const id = setTimeout(fn, 1200);
+  return () => clearTimeout(id);
+};
 
 const useVisitorCounter = () => {
-  const [visitorCount, setVisitorCount] = useState(3450);
+  const [visitorCount, setVisitorCount] = useState(BASE_COUNT);
   const [isLoading, setIsLoading] = useState(true);
   const [isNewVisitor, setIsNewVisitor] = useState(false);
 
   useEffect(() => {
-    const initializeVisitorCounter = async () => {
-      const lastVisit = localStorage.getItem('portfolio_last_visit');
-      const sessionId = localStorage.getItem('portfolio_session_id');
-      const today = new Date().toDateString();
-      const currentSession = Date.now().toString();
-      
-      let shouldIncrement = false;
+    let cancelled = false;
+    let unsubscribe = null;
+    const { increment, isNew } = getVisitDecision();
+    setIsNewVisitor(isNew);
 
-      // Check if this is a new session
-      if (!sessionId || !lastVisit) {
-        // First time visitor
-        shouldIncrement = true;
-        localStorage.setItem('portfolio_last_visit', today);
-        localStorage.setItem('portfolio_session_id', currentSession);
-        setIsNewVisitor(true);
-      } else if (lastVisit !== today) {
-        // Returning visitor on a new day
-        shouldIncrement = true;
-        localStorage.setItem('portfolio_last_visit', today);
-        localStorage.setItem('portfolio_session_id', currentSession);
-      }
-
-      // Try Firebase, fallback to local counter
-      if (database) {
-        try {
-          console.log('🔥 Attempting to connect to Firebase...');
-          const visitorRef = ref(database, 'visitorCount');
-
-          // Listen to visitor count changes
-          const unsubscribe = onValue(visitorRef, (snapshot) => {
-            console.log('✅ Firebase connected! Current count:', snapshot.val());
-            const count = snapshot.val() || 3450;
-            setVisitorCount(count);
-            setIsLoading(false);
-          }, (error) => {
-            console.error('❌ Firebase read error:', error.code, error.message);
-            useFallbackCounter();
-          });
-
-          // Increment count if new visitor or new day
-          if (shouldIncrement) {
-            console.log('📈 Incrementing visitor count...');
-            await runTransaction(visitorRef, (currentCount) => {
-              if (currentCount === null) {
-                console.log('🆕 Initializing count to 3451');
-                return 3451; // Initialize with base count + 1
-              }
-              console.log('➕ Incrementing from', currentCount, 'to', currentCount + 1);
-              return currentCount + 1;
-            }).catch((error) => {
-              console.error('❌ Firebase write error:', error.code, error.message);
-            });
-          }
-
-          return () => unsubscribe();
-        } catch (error) {
-          console.error('❌ Firebase error:', error);
-          useFallbackCounter();
-        }
-      } else {
-        console.log('⚠️ Firebase not initialized, using fallback counter');
-        useFallbackCounter();
-      }
-
-      function useFallbackCounter() {
-        const baseCount = 3450;
-        const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-        const dailyIncrement = Math.floor((daysSinceEpoch - 19700) * 2.5);
-        setVisitorCount(baseCount + dailyIncrement + (shouldIncrement ? 1 : 0));
-        setIsLoading(false);
-      }
+    const applyFallback = () => {
+      if (cancelled) return;
+      setVisitorCount(fallbackCount(increment));
+      setIsLoading(false);
     };
 
-    initializeVisitorCounter();
+    const cancelIdle = whenIdle(async () => {
+      try {
+        const { database, ref, onValue, runTransaction } = await loadDatabase();
+        if (cancelled) return;
+        const visitorRef = ref(database, 'visitorCount');
+        unsubscribe = onValue(
+          visitorRef,
+          (snapshot) => {
+            if (cancelled) return;
+            setVisitorCount(snapshot.val() || BASE_COUNT);
+            setIsLoading(false);
+          },
+          applyFallback
+        );
+        if (increment) {
+          runTransaction(visitorRef, (current) => (current === null ? BASE_COUNT + 1 : current + 1)).catch(() => {});
+        }
+      } catch {
+        applyFallback();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      cancelIdle();
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
-  // Format number with commas
-  const formatCount = (count) => {
-    if (typeof count !== 'number' || isNaN(count)) return '3,450';
-    return count.toLocaleString();
-  };
-
-  // Generate a motivational message based on visitor count
-  const getVisitorMessage = () => {
-    if (isNewVisitor) {
-      return "Welcome! You're visitor #" + formatCount(visitorCount);
-    }
-    return "Total visitors: " + formatCount(visitorCount);
-  };
+  const formatted = typeof visitorCount === 'number' && !Number.isNaN(visitorCount)
+    ? visitorCount.toLocaleString()
+    : BASE_COUNT.toLocaleString();
 
   return {
-    visitorCount: formatCount(visitorCount),
+    visitorCount: formatted,
     rawCount: visitorCount,
     isLoading,
     isNewVisitor,
-    message: getVisitorMessage()
+    message: isNewVisitor ? `Welcome! You're visitor #${formatted}` : `Total visitors: ${formatted}`,
   };
 };
 

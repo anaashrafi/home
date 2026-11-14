@@ -5,7 +5,7 @@
   "FirstName": "Anurag",
   "MiddleName": "",
   "LastName": "Vaidhya",
-  "devDesc": "Passionate about changing the world with technology and constant learning.",
+  "devDesc": "Designing, automating and securing enterprise cloud platforms — AWS first, then GCP and Azure.",
   "icons": [
     {
       "id": 0,
@@ -37,7 +37,7 @@
   "instaLink": "https://www.instagram.com/",
   "instaUsername": "anuuu89",
   "instaQuerry": "/?__a=1",
-  "aboutDescription": "Strategic and hands-on technology leader with 15+ years of experience across DevSecOps, platform engineering, and cloud infrastructure. Known for bridging the gap between engineering strategy and execution—designing and delivering secure, scalable, and high-performing platforms that enable speed, stability, and innovation at scale.Deeply hands-on with modern cloud-native technologies, CI/CD, Kubernetes, infrastructure as code, observability, and security automation. Proven ability to roll up sleeves when needed—whether architecting resilient cloud systems, optimizing platform performance, or driving incident response—while mentoring teams and shaping long-term engineering vision.A trusted leader at the intersection of cloud, security, and automation. Adept at aligning engineering priorities with business objectives, embedding security into the software lifecycle, and cultivating high-impact teams that deliver value fast and safely.",
+  "aboutDescription": "Designing, automating, and securing enterprise-scale cloud platforms. Proven record engineering future-proof platforms on AWS and OpenShift, driving Terraform-based IaC at scale, and embedding security and governance into every delivery layer, including secure platforms for generative AI and agentic workloads on AWS Bedrock. Expert at translating strategic goals into actionable engineering outcomes — coaching teams, championing automation-first culture, and aligning platform capability with business objectives across complex enterprise environments.",
   "projectHeading": "Recent Projects",
   "gitHubLink": "https://api.github.com/users/",
   "gitHubUsername": "anuu1989",

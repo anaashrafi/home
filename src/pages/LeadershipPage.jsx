@@ -6,7 +6,7 @@ const Leadership = React.lazy(() => import("../components/home/Leadership"));
 
 const LeadershipPage = () => (
   <div>
-    <PageHeader title="Leadership & Management" subtitle="15+ years of leading high-performing teams and driving successful project outcomes across diverse industries" />
+    <PageHeader kicker="~/leadership" title="Leadership & Management" subtitle="15+ years of leading high-performing teams and driving successful project outcomes across diverse industries" />
     <Suspense fallback={<LoadingSpinner />}>
       <Leadership />
     </Suspense>

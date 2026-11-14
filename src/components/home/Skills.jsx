@@ -1,87 +1,72 @@
 import React, { useState } from "react";
 import Reveal from "../Reveal";
 import CountUp from "../CountUp";
-
-const SKILL_CATEGORIES = [
-  { id: "cloud", title: "Cloud Platforms & Services", icon: "fas fa-server", skills: [
-    { name: "AWS", level: 80, experience: "8+ years", projects: 25, tags: ["EC2", "Lambda", "S3", "RDS"] },
-    { name: "Azure", level: 75, experience: "6+ years", projects: 18, tags: ["App Service", "Functions", "DevOps"] },
-    { name: "GCP", level: 70, experience: "4+ years", projects: 12, tags: ["Compute Engine", "Cloud Run", "BigQuery"] },
-    { name: "OpenShift", level: 72, experience: "5+ years", projects: 10, tags: ["Enterprise", "Operators", "Pipelines"] },
-  ]},
-  { id: "devops", title: "DevOps & Infrastructure", icon: "fas fa-cloud", skills: [
-    { name: "CI/CD Pipelines", level: 90, experience: "9+ years", projects: 28, tags: ["Jenkins", "GitLab CI", "GitHub Actions"] },
-    { name: "Docker", level: 85, experience: "7+ years", projects: 22, tags: ["Containerization", "Multi-stage", "Compose"] },
-    { name: "Kubernetes", level: 75, experience: "5+ years", projects: 15, tags: ["Orchestration", "Helm", "Operators"] },
-    { name: "Terraform", level: 82, experience: "6+ years", projects: 18, tags: ["IaC", "Multi-cloud", "Modules"] },
-  ]},
-  { id: "programming", title: "Programming & Development", icon: "fas fa-code", skills: [
-    { name: "Java", level: 85, experience: "8+ years", projects: 25, tags: ["Enterprise", "Spring Boot", "Microservices"] },
-    { name: "Node.js", level: 87, experience: "6+ years", projects: 18, tags: ["Backend", "APIs", "Real-time"] },
-    { name: "Python", level: 80, experience: "5+ years", projects: 15, tags: ["Automation", "Data Science", "ML"] },
-    { name: "JavaScript", level: 90, experience: "10+ years", projects: 30, tags: ["Frontend", "React", "Vue.js"] },
-  ]},
-  { id: "testing", title: "Testing & Quality Engineering", icon: "fas fa-vial", skills: [
-    { name: "Test Automation", level: 95, experience: "12+ years", projects: 40, tags: ["Selenium", "Cypress", "Playwright"] },
-    { name: "API Testing", level: 92, experience: "10+ years", projects: 35, tags: ["REST", "GraphQL", "Postman"] },
-    { name: "Performance Testing", level: 85, experience: "8+ years", projects: 20, tags: ["JMeter", "LoadRunner", "K6"] },
-    { name: "Security Testing", level: 78, experience: "6+ years", projects: 12, tags: ["OWASP", "Penetration", "SAST"] },
-  ]},
-];
+import TechRadar from "../skills/TechRadar";
+import FocusAreas from "../skills/FocusAreas";
+import { SKILL_CATEGORIES, CERTIFICATIONS, levelLabel, yearsOfExperience } from "../../data/profile";
 
 const RESPONSIBILITY_CATEGORIES = [
   {
-    category: "Testing & Automation", icon: "fas fa-vial",
+    category: "Cloud Platforms & Governance", icon: "fas fa-cloud",
     items: [
-      "Creating testing and test automation strategy on program/project level",
-      "Automating testing scenarios for UI and API layers",
-      "Designing and developing automation testing frameworks",
-      "Implementing shift left testing with Service Virtualization tools",
+      "Designing multi-account AWS and GCP landing zones with centralised IAM, network segmentation, and audit logging",
+      "Enforcing organisation-wide guardrails with allow-list Service Control Policies and AWS Service Catalog",
+      "Defining multi-cloud and hybrid governance: policies, guardrails, and architectural standards",
+      "Leading cloud migration and modernisation — rehost, replatform, and refactor",
     ],
   },
   {
-    category: "DevOps & CI/CD", icon: "fas fa-cogs",
+    category: "Platform Engineering", icon: "fas fa-layer-group",
     items: [
-      "Build automation and deployment automation",
-      "Building CI/CD automation pipelines with various tools",
-      "Containerization strategy and best practices implementation",
-      "Infrastructure as Code using Terraform",
+      "Engineering secure OpenShift, EKS, and GKE platforms with Istio, RBAC, and network policies",
+      "Building modular Terraform / Terraform Cloud frameworks with policy-as-code enforcement",
+      "Delivering developer self-service for infrastructure, secrets, networking, and deployments",
+      "Designing enterprise backup and recovery with tag-based AWS Backup plans",
     ],
   },
   {
-    category: "Cloud & Infrastructure", icon: "fas fa-cloud",
+    category: "DevOps & Automation", icon: "fas fa-infinity",
     items: [
-      "Creating and managing cloud infrastructure",
-      "Designing cloud architecture with security endorsement",
-      "Container orchestration with Kubernetes and OpenShift",
-      "Platform automation and management",
+      "Building end-to-end CI/CD with GitHub Actions, GitLab CI, Jenkins, CircleCI, and ArgoCD",
+      "Pre-deployment validation, cost estimation, post-deployment health tests, and guarded destroy workflows",
+      "Automating provisioning, deployment, and operations to optimise cost, availability, and performance",
+      "Full-stack observability with Prometheus, Grafana, ELK, Dynatrace, Splunk, and OpenTelemetry",
+    ],
+  },
+  {
+    category: "DevSecOps & Compliance", icon: "fas fa-shield-halved",
+    items: [
+      "Securing the software supply chain with SAST, DAST, SCA, SBOM generation, and image signing",
+      "Policy as code with OPA Gatekeeper, Checkov, and Sentinel",
+      "Zero-trust security models: least-privilege IAM, ABAC/RBAC, OAuth2/OIDC",
+      "Continuous CSPM and compliance against CIS, ISO 27001, SOC2, NIST, PCI-DSS, and GDPR",
+    ],
+  },
+  {
+    category: "AI Platforms", icon: "fas fa-robot",
+    items: [
+      "Secure reference architectures for agentic AI on AWS Bedrock AgentCore",
+      "AI security controls: Bedrock Guardrails, WAF, and multi-provider authorisers",
+      "Retrieval-augmented generation with Bedrock Knowledge Bases and OpenSearch Serverless",
+      "Rapid GenAI proofs of concept, such as a Groq-powered chatbot",
     ],
   },
   {
     category: "Leadership & Strategy", icon: "fas fa-users",
     items: [
-      "Team handling, guidance, and mentoring",
-      "GTM strategy development for products and solutions",
-      "Customer consultation for testing, SV, and DevOps",
-      "Requirements gathering and scope analysis",
-    ],
-  },
-  {
-    category: "Organizational Development", icon: "fas fa-chart-line",
-    items: [
-      "Designing DevOps Maturity Models for organizations",
-      "Cross-team coordination and collaboration",
-      "Process improvement and optimization",
-      "Technology adoption and transformation",
+      "Building, hiring, and scaling Platform Engineering and DevSecOps teams",
+      "Mentoring engineers through workshops and design reviews",
+      "Translating strategic goals into executable platform roadmaps",
+      "Aligning platform strategy with C-suite, security, and compliance stakeholders",
     ],
   },
 ];
 
 const RESPONSIBILITY_IMPACT = [
-  { end: 50, suffix: "+", label: "Projects Led" },
-  { end: 15, suffix: "+", label: "Teams Managed" },
-  { end: 25, suffix: "+", label: "Cloud Migrations" },
-  { end: 100, suffix: "+", label: "Automations Built" },
+  { end: yearsOfExperience(), suffix: "+", label: "Years in Engineering" },
+  { end: 50, suffix: "+", label: "Workloads Assessed for Migration" },
+  { end: 3, suffix: "", label: "Clouds: AWS, GCP, Azure" },
+  { end: CERTIFICATIONS.length, suffix: "", label: "Certifications Earned" },
 ];
 
 const SOFT_SKILLS = [
@@ -93,18 +78,9 @@ const SOFT_SKILLS = [
   { name: "Strategic & Systems Thinking", icon: "fas fa-chess", rating: 5, description: "Long-term planning and architectural decision making", achievements: ["Enterprise architecture", "Technology roadmaps", "Digital transformation"] },
 ];
 
-const CERTIFICATIONS = [
-  { name: "AWS DevOps - Professional", issuer: "Amazon Web Services", year: "2022", icon: "fab fa-aws", status: "Active" },
-  { name: "AWS Developer - Associate", issuer: "Amazon Web Services", year: "2022", icon: "fab fa-aws", status: "Active" },
-  { name: "Certified Kubernetes Application Developer", issuer: "Cloud Native Computing Foundation", year: "2022", icon: "fas fa-dharmachakra", status: "Active" },
-  { name: "HashiCorp Certified Terraform Associate", issuer: "HashiCorp", year: "2021", icon: "fas fa-layer-group", status: "Expired" },
-  { name: "Certified Jenkins Engineer", issuer: "CloudBees", year: "2022", icon: "fas fa-cogs", status: "Active" },
-  { name: "Google Cloud Architect Professional", issuer: "Google Cloud", year: "2019", icon: "fab fa-google", status: "Expired" },
-  { name: "Scrum Master Pro by ISQI", issuer: "ISQI", year: "2018", icon: "fas fa-users-cog", status: "Active" },
-];
-
 const TABS = [
   { id: "technical", icon: "fas fa-code", label: "Technical Skills" },
+  { id: "radar", icon: "fas fa-bullseye", label: "Tech Radar" },
   { id: "responsibilities", icon: "fas fa-star", label: "Responsibilities" },
   { id: "soft", icon: "fas fa-users", label: "Leadership" },
   { id: "certifications", icon: "fas fa-certificate", label: "Certifications" },
@@ -126,6 +102,10 @@ const Skills = () => {
 
   return (
     <div className="container">
+      <Reveal as="section" style={{ marginBottom: "var(--space-xl)" }}>
+        <FocusAreas />
+      </Reveal>
+
       <Reveal as="section" className="section" style={{ paddingTop: 0 }}>
         <div className="project-toolbar" style={{ marginBottom: 0 }}>
           <div className="tabs" style={{ marginBottom: 0, borderBottom: "none" }} role="tablist">
@@ -144,6 +124,8 @@ const Skills = () => {
         </div>
         <div style={{ borderBottom: "1px solid var(--color-border)", marginBottom: "var(--space-lg)" }}></div>
 
+        {activeTab === "radar" && <TechRadar />}
+
         {activeTab === "technical" && (
           <div className="stack" style={{ '--gap': 'var(--space-xl)' }}>
             {(search ? filteredCategories : SKILL_CATEGORIES).map((cat) => (
@@ -153,14 +135,16 @@ const Skills = () => {
                 </h3>
                 <div className="grid grid-auto-lg">
                   {cat.skills.map((skill) => (
-                    <div key={skill.name} className="card card-pad card-hover">
+                    <div key={skill.name} className={`card card-pad card-hover ${skill.featured ? "skill-featured" : ""}`}>
                       <div className="spread">
                         <h4 style={{ fontSize: "var(--fs-md)" }}>{skill.name}</h4>
-                        <span className="tag">{skill.level >= 90 ? "Expert" : skill.level >= 80 ? "Advanced" : skill.level >= 70 ? "Intermediate" : "Beginner"}</span>
+                        <span className={`tag ${skill.featured ? "tag-accent" : ""}`}>{skill.featured ? "Core · " : ""}{levelLabel(skill.level)}</span>
                       </div>
-                      <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-text-tertiary)", margin: "var(--space-2xs) 0" }}>
-                        {skill.experience} &middot; {skill.projects} projects
-                      </p>
+                      {skill.experience && (
+                        <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-text-tertiary)", margin: "var(--space-2xs) 0" }}>
+                          {skill.experience}
+                        </p>
+                      )}
                       <div className="progress" style={{ margin: "var(--space-2xs) 0 var(--space-sm)" }}>
                         <div className="progress-fill" style={{ width: `${skill.level}%` }}></div>
                       </div>
@@ -244,9 +228,9 @@ const Skills = () => {
               ))}
             </div>
             <div className="stat-grid" style={{ marginTop: "var(--space-lg)" }}>
-              <div className="stat"><span className="stat-number"><CountUp end={5} /></span><span className="stat-label">Active Certifications</span></div>
+              <div className="stat"><span className="stat-number"><CountUp end={CERTIFICATIONS.filter((c) => c.status === "Active").length} /></span><span className="stat-label">Active Certifications</span></div>
               <div className="stat"><span className="stat-number">2022</span><span className="stat-label">Latest Achievement</span></div>
-              <div className="stat"><span className="stat-number"><CountUp end={7} /></span><span className="stat-label">Total Earned</span></div>
+              <div className="stat"><span className="stat-number"><CountUp end={CERTIFICATIONS.length} /></span><span className="stat-label">Total Earned</span></div>
             </div>
           </>
         )}

@@ -5,7 +5,7 @@ import ContactSection from "../components/modern/ContactSection";
 
 const ContactPage = () => (
   <div>
-    <PageHeader title="Let's Connect" subtitle="With 15+ years in technology leadership, I'm ready to discuss your next project, share insights, or explore collaboration opportunities." />
+    <PageHeader kicker="~/contact" title="Let's Connect" subtitle="Hiring, consulting, a gnarly platform problem, or just want to talk Kubernetes? Pick whichever channel suits you." />
     <Suspense fallback={<LoadingSpinner />}>
       <ContactSection />
     </Suspense>
